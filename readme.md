@@ -27,6 +27,13 @@ source env/bin/activate # activate the virtual environment on linux
 env/Scripts/activate # activate the virtual environment on windows
 pip install -r requirements.txt
 
+#for ubuntu
+#first install python3.10
+python3.10 -m venv env
+source env/bin/activate # activate the virtual environment
+pip3 install -r requirements.txt
+
+
 #run the app
 python app.py
 ```
