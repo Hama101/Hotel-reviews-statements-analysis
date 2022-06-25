@@ -46,3 +46,4 @@ typing_extensions==4.2.0
 urllib3==1.26.9
 wasabi==0.9.1
 Werkzeug==2.1.2
+gunicorn
