@@ -15,16 +15,28 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.metrics import confusion_matrix
 from sklearn.pipeline import Pipeline
+import joblib
 
-# Local directory
-Reviewdata1 = pd.read_csv('data\data-set-train.csv')
-Reviewdata2 = pd.read_csv('data\hotel-reviews.csv')
-Reviewdata = pd.concat([Reviewdata1, Reviewdata2])
-#Data Credit - https://www.kaggle.com/anu0012/hotel-review/data
 
-# Reviewdata.info()
+def save_pipeline_model(model):
+    print("Saving Model...")
+    joblib.dump(model, 'model/model.joblib')
+    print("****done saving the model ****")
 
+#load the model from the \model folder
 def load_model():
+    print("Loading Model...")
+    model = joblib.load('model/model.joblib')
+    print("****done loading the model ****")
+    return model
+
+def train_model():
+    # Local directory
+    Reviewdata1 = pd.read_csv('data\data-set-train.csv')
+    Reviewdata2 = pd.read_csv('data\hotel-reviews.csv')
+    Reviewdata = pd.concat([Reviewdata1, Reviewdata2])
+    #Data Credit - https://www.kaggle.com/anu0012/hotel-review/data
+
     print("Loading Model...")
     Reviewdata.describe().transpose()
 
@@ -32,17 +44,6 @@ def load_model():
     count = Reviewdata.isnull().sum().sort_values(ascending=False)
     percentage = ((Reviewdata.isnull().sum()/len(Reviewdata)*100)).sort_values(ascending=False)
     missing_data = pd.concat([count, percentage], axis=1, keys=['Count','Percentage'])
-
-    # print('Count and percentage of missing values for the columns:')
-
-    ### Checking for the Distribution of Default ###
-
-    # %matplotlib inline
-    # print('Percentage for default\n')
-    # print(round(Reviewdata.Is_Response.value_counts(normalize=True)*100,2))
-    # round(Reviewdata.Is_Response.value_counts(normalize=True)*100,2).plot(kind='bar')
-    # plt.title('Percentage Distributions by review type')
-    # plt.show()
 
     #Removing columns
     Reviewdata.drop(columns = ['User_ID', 'Browser_Used', 'Device_Used'], inplace = True)
@@ -79,11 +80,6 @@ def load_model():
 
     IV_train, IV_test, DV_train, DV_test = train_test_split(Independent_var, Dependent_var, test_size = 0.1, random_state = 225)
 
-    # print('IV_train :', len(IV_train))
-    # print('IV_test  :', len(IV_test))
-    # print('DV_train :', len(DV_train))
-    # print('DV_test  :', len(DV_test))
-
     tvec = TfidfVectorizer()
     clf2 = LogisticRegression(solver = "lbfgs")
 
@@ -95,12 +91,9 @@ def load_model():
 
     confusion_matrix(predictions, DV_test)
 
-    # print("Accuracy : ", accuracy_score(predictions, DV_test))
-    # print("Precision : ", precision_score(predictions, DV_test, average = 'weighted'))
-    # print("Recall : ", recall_score(predictions, DV_test, average = 'weighted'))
-
     print("****done loading the model ****")
-
+    # save the model to \model
+    save_pipeline_model(model)
     return model
 
 
@@ -109,5 +102,6 @@ async def load_model_async():
 
 
 if __name__ == '__main__':
+    train_model()
     load_model()
 

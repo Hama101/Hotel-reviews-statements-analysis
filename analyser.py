@@ -36,6 +36,8 @@ def clean_text(text):
 
 #*split list of sentences to list of words with . or , or ? or ! or : or ;
 def split_sentences(text):
+    # text to lowwer
+    text = text.lower()
     punctuation = ['.'  , '?' , '!' ]
     statements = []
     for char in text:
@@ -93,8 +95,7 @@ def identity_issues(list_of_issues):
 
 # * this function takes a text and the loaded model and return if the passed text happy or not!
 def analyse_text(text = s , model = None):
-    print(text)
-    print("i m here")
+
     text = split_sentences(text)
     result = list(model.predict(text))
     print("i m here")
@@ -104,13 +105,16 @@ def analyse_text(text = s , model = None):
     list_of_negative_statements = []
     #loop throw the list of results and check if the result is happy or not
     for i in range(len(result)):
-        if result[i] == "happy":
-            happy_occ += 1
-            list_of_positive_statements.append(clean_text(text[i]))
-
-        else:
+        if 'not happy' in text[i]:
             not_happy_occ += 1
-            list_of_negative_statements.append(clean_text(text[i]))
+            list_of_negative_statements.append(text[i])
+        else:
+            if result[i] == "happy":
+                happy_occ += 1
+                list_of_positive_statements.append(clean_text(text[i]))
+            else:
+                not_happy_occ += 1
+                list_of_negative_statements.append(clean_text(text[i]))
 
     # print(text)
     print(len(list_of_positive_statements))
