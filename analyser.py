@@ -6,7 +6,7 @@ from summarizer import text_summarizer
 import re 
 import string
 #import issues dummy data
-from issues import ISSUES_CATEGORIES
+from issues import ISSUES_CATEGORIES , NEGATION_ATTRUIBUITES , NEGATION_WORDS
 
 s = """
 The environment of the hotel was really cool. But when talking
@@ -105,16 +105,30 @@ def analyse_text(text = s , model = None):
     list_of_negative_statements = []
     #loop throw the list of results and check if the result is happy or not
     for i in range(len(result)):
-        if 'not happy' in text[i]:
-            not_happy_occ += 1
-            list_of_negative_statements.append(text[i])
-        else:
-            if result[i] == "happy":
-                happy_occ += 1
+        #check if the result[i] is happy
+        if result[i] == "happy":
+            is_trully_happy = True
+            #loop NEGATION_WORDS and check if the word is in the text[i]
+            for word in NEGATION_WORDS:
+                if word in text[i]:
+                    not_happy_occ += 1
+                    list_of_negative_statements.append(clean_text(text[i]))
+                    is_trully_happy = False
+                    break
+            #loop NEGATION_ATTRUIBUITES and check if the word is in the text[i]
+            for word in NEGATION_ATTRUIBUITES:
+                if word in text[i]:
+                    not_happy_occ += 1
+                    list_of_negative_statements.append(clean_text(text[i]))
+                    is_trully_happy = False
+                    break
+            #if the result[i] is happy and is_trully_happy is True
+            if is_trully_happy:
                 list_of_positive_statements.append(clean_text(text[i]))
-            else:
-                not_happy_occ += 1
-                list_of_negative_statements.append(clean_text(text[i]))
+                happy_occ += 1
+        else:
+            not_happy_occ += 1
+            list_of_negative_statements.append(clean_text(text[i]))
 
     # print(text)
     print(len(list_of_positive_statements))
@@ -128,9 +142,9 @@ def analyse_text(text = s , model = None):
 
     return {
         "is_happy" : is_happy,
-        "list_of_positive_statements" : list_of_positive_statements,
-        "list_of_negative_statements" : list_of_negative_statements,
-        "list_of_negative_statements_by_category" : identity_issues(list_of_negative_statements),
+        "list_of_positive_statements" : list(set(list_of_positive_statements)),
+        "list_of_negative_statements" : list(set(list_of_negative_statements)),
+        "list_of_negative_statements_by_category" : identity_issues(list(set(list_of_negative_statements))),
         }
 
 
